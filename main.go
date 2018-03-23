@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"log"
+
 	"github.com/wisdomdev/wisdom-business-server/wst"
 )
 
 func main() {
-	fmt.Println("business server.")
-	httpserver := wst.New()
-	httpserver.Run()
+	log.Println("business server.")
+	wstserver := wst.New()
+	wstserver.Run()
 }
