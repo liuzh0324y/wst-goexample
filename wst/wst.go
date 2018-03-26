@@ -27,10 +27,13 @@ func (wst *Wst) Run() {
 	http.Handle("/static/html/", http.FileServer(http.Dir("static/html")))
 	http.Handle("/static/js/", http.FileServer(http.Dir("static/js")))
 	http.Handle("/static/css/", http.FileServer(http.Dir("static/css")))
+	http.Handle("/static/", http.FileServer(http.Dir("static")))
 	
+	http.HandleFunc("/index/", indexHandler)
 	http.HandleFunc("/admin/", adminHandler)
 	http.HandleFunc("/login/", loginHandler)
 	http.HandleFunc("/ajax/", ajaxHandler)
+	http.HandleFunc("/webrtc/", webrtcHandler)
 	http.HandleFunc("/", notFoundHandler)
 
 	log.Fatal(http.ListenAndServe(":8090",nil))
@@ -38,7 +41,7 @@ func (wst *Wst) Run() {
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/" {
-		http.Redirect(w, r, "/login/index", http.StatusFound)
+		http.Redirect(w, r, "/index/", http.StatusFound)
 		// t, err := template.ParseFiles("static/html/index.html")
 		// if err != nil {
 		// 	log.Println(err)
@@ -52,6 +55,20 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	t.Execute(w, nil)
 	log.Println("not found handler")
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	var action = ""
+	index := &indexController{}
+	controller := reflect.ValueOf(index)
+	method := controller.MethodByName(action)
+	if !method.IsValid() {
+		method = controller.MethodByName(strings.Title("index") + "Action")
+	}
+	requestValue := reflect.ValueOf(r)
+	responseValue := reflect.ValueOf(w)
+	method.Call([]reflect.Value{responseValue, requestValue})
+	log.Println("index handler")
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -118,4 +135,24 @@ func ajaxHandler(w http.ResponseWriter, r *http.Request) {
 	responseValue := reflect.ValueOf(w)
 	method.Call([]reflect.Value{responseValue, requestValue})
 	log.Println("ajax handler")
+}
+
+func webrtcHandler(w http.ResponseWriter, r *http.Request) {
+	pathInfo := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(pathInfo, "/")
+	var action = ""
+	if len(parts) > 1 {
+		action = strings.Title(parts[1]) + "Action"
+	}
+	log.Println("webrtc action: " + action)
+	webrtc := &webrtcController{}
+	controller := reflect.ValueOf(webrtc)
+	method := controller.MethodByName(action)
+	if !method.IsValid() {
+		method = controller.MethodByName(strings.Title("index") + "Action")
+	}
+	requestValue := reflect.ValueOf(r)
+	responseValue := reflect.ValueOf(w)
+	method.Call([]reflect.Value{responseValue, requestValue})
+	log.Println("webrtc handler")
 }
