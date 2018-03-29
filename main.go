@@ -8,6 +8,6 @@ import (
 
 func main() {
 	log.Println("business server.")
-	wstserver := wst.New()
+	wstserver := wst.New("/home/liuzh/work/workspace/src/github.com/wisdomdev/wisdom-business-server/static")
 	wstserver.Run()
 }

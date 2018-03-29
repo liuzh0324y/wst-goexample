@@ -1,17 +1,17 @@
 package wst
 
-import(
+import (
+	"html/template"
 	"log"
 	"net/http"
-	"html/template"
 )
 
 type indexController struct {
-
+	path string
 }
 
-func (this *indexController)IndexAction(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("static/html/index.html")
+func (this *indexController) IndexAction(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(this.path + "/html/index.html")
 	if err != nil {
 		log.Println(err)
 	}

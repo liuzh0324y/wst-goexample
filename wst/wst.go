@@ -1,22 +1,24 @@
-package wst 
+package wst
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"html/template"
-	"strings"
 	"reflect"
+	"strings"
 )
 
 // Wst struct
 type Wst struct {
-	test int
+	test     int
+	confPath string
 }
 
-// New Wst 
-func New() *Wst {
+// New Wst
+func New(path string) *Wst {
 	obj := &Wst{
-		test : 0,
+		test:     0,
+		confPath: path,
 	}
 	return obj
 }
@@ -24,42 +26,38 @@ func New() *Wst {
 // Run attaches the router to a http.Server and starts listening and serving HTTP requests.
 func (wst *Wst) Run() {
 
-	http.Handle("/static/html/", http.FileServer(http.Dir("static/html")))
-	http.Handle("/static/js/", http.FileServer(http.Dir("static/js")))
-	http.Handle("/static/css/", http.FileServer(http.Dir("static/css")))
-	http.Handle("/static/", http.FileServer(http.Dir("static")))
-	
-	http.HandleFunc("/index/", indexHandler)
-	http.HandleFunc("/admin/", adminHandler)
-	http.HandleFunc("/login/", loginHandler)
-	http.HandleFunc("/ajax/", ajaxHandler)
-	http.HandleFunc("/webrtc/", webrtcHandler)
-	http.HandleFunc("/", notFoundHandler)
+	// http.Handle("/static/html/", http.FileServer(http.Dir("static/html")))
+	// http.Handle("/static/js/", http.FileServer(http.Dir("static/js")))
+	// http.Handle("/static/css/", http.FileServer(http.Dir("static/css")))
+	// http.Handle("/static/", http.FileServer(http.Dir("static")))
 
-	log.Fatal(http.ListenAndServe(":8090",nil))
+	http.HandleFunc("/index/", wst.indexHandler)
+	http.HandleFunc("/admin/", wst.adminHandler)
+	http.HandleFunc("/login/", wst.loginHandler)
+	http.HandleFunc("/ajax/", wst.ajaxHandler)
+	http.HandleFunc("/webrtc/", wst.webrtcHandler)
+	http.HandleFunc("/", wst.notFoundHandler)
+
+	// log.Fatal(http.ListenAndServe(":8090", nil))
+	log.Fatal(http.ListenAndServeTLS(":8090", wst.confPath+"/key/cert.pem", wst.confPath+"/key/key.pem", nil))
 }
 
-func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+func (wst *Wst) notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/" {
 		http.Redirect(w, r, "/index/", http.StatusFound)
-		// t, err := template.ParseFiles("static/html/index.html")
-		// if err != nil {
-		// 	log.Println(err)
-		// }
-		// t.Execute(w, nil)
 	}
 
-	t, err := template.ParseFiles("static/html/404.html")
+	t, err := template.ParseFiles(wst.confPath + "/html/404.html")
 	if err != nil {
 		log.Println(err)
 	}
 	t.Execute(w, nil)
-	log.Println("not found handler")
+	log.Println("notFound handler")
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+func (wst *Wst) indexHandler(w http.ResponseWriter, r *http.Request) {
 	var action = ""
-	index := &indexController{}
+	index := &indexController{path: wst.confPath}
 	controller := reflect.ValueOf(index)
 	method := controller.MethodByName(action)
 	if !method.IsValid() {
@@ -71,7 +69,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("index handler")
 }
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
+func (wst *Wst) loginHandler(w http.ResponseWriter, r *http.Request) {
 	pathInfo := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(pathInfo, "/")
 	var action = ""
@@ -79,7 +77,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		action = strings.Title(parts[1]) + "Action"
 	}
 
-	login := &loginController{}
+	login := &loginController{path: wst.confPath}
 	controller := reflect.ValueOf(login)
 	method := controller.MethodByName(action)
 	if !method.IsValid() {
@@ -91,7 +89,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("login handler")
 }
 
-func adminHandler(w http.ResponseWriter, r *http.Request) {
+func (wst *Wst) adminHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("admin_name")
 	if err != nil || cookie.Value == "" {
 		http.Redirect(w, r, "/login/index", http.StatusFound)
@@ -101,10 +99,10 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(pathInfo, "/")
 	var action = ""
 	if len(parts) > 1 {
-		action = strings.Title(parts[1])+"Action" 
+		action = strings.Title(parts[1]) + "Action"
 	}
 
-	admin := &adminController{}
+	admin := &adminController{path: wst.confPath}
 	controller := reflect.ValueOf(admin)
 	method := controller.MethodByName(action)
 	if !method.IsValid() {
@@ -117,7 +115,7 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("admin handler")
 }
 
-func ajaxHandler(w http.ResponseWriter, r *http.Request) {
+func (wst *Wst) ajaxHandler(w http.ResponseWriter, r *http.Request) {
 	pathInfo := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(pathInfo, "/")
 	var action = ""
@@ -137,7 +135,7 @@ func ajaxHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("ajax handler")
 }
 
-func webrtcHandler(w http.ResponseWriter, r *http.Request) {
+func (wst *Wst) webrtcHandler(w http.ResponseWriter, r *http.Request) {
 	pathInfo := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(pathInfo, "/")
 	var action = ""
@@ -145,7 +143,7 @@ func webrtcHandler(w http.ResponseWriter, r *http.Request) {
 		action = strings.Title(parts[1]) + "Action"
 	}
 	log.Println("webrtc action: " + action)
-	webrtc := &webrtcController{}
+	webrtc := &webrtcController{path: wst.confPath}
 	controller := reflect.ValueOf(webrtc)
 	method := controller.MethodByName(action)
 	if !method.IsValid() {

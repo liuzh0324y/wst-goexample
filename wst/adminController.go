@@ -1,9 +1,9 @@
 package wst
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"html/template"
 )
 
 type User struct {
@@ -11,11 +11,11 @@ type User struct {
 }
 
 type adminController struct {
-
+	path string
 }
 
-func (this *adminController)IndexAction(w http.ResponseWriter, r *http.Request, user string) {
-	t, err := template.ParseFiles("static/html/admin/index.html")
+func (this *adminController) IndexAction(w http.ResponseWriter, r *http.Request, user string) {
+	t, err := template.ParseFiles(this.path + "/html/admin/index.html")
 	if err != nil {
 		log.Println(err)
 	}

@@ -1,17 +1,17 @@
-package wst 
+package wst
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"html/template"
 )
 
 type loginController struct {
-	
+	path string
 }
 
-func (this *loginController)IndexAction(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("static/html/login/index.html")
+func (this *loginController) IndexAction(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(this.path + "/html/login/index.html")
 	if err != nil {
 		log.Println(err)
 	}
