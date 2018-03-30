@@ -1,7 +1,7 @@
 'use strict';
 
-var leftVideo = document.getElementById('leftVideo');
-var rightVideo = document.getElementById('rightVideo');
+var leftVideo = document.getElementById('leftVideo')
+var rightVideo = document.getElementById('rightVideo')
 
 var stream;
 

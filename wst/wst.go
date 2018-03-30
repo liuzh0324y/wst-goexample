@@ -43,6 +43,7 @@ func (wst *Wst) Run() {
 }
 
 func (wst *Wst) notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.Path)
 	if r.URL.Path == "/" {
 		http.Redirect(w, r, "/index/", http.StatusFound)
 	}

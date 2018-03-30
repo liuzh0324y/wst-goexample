@@ -47,6 +47,15 @@ func (this *webrtcController) VideoToVideoAction(w http.ResponseWriter, r *http.
 	log.Println("webrtcController-->VideoToVideoAction")
 }
 
+func (this *webrtcController) PeerConnectionAction(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(this.path + "/html/webrtc/peerconnection.html")
+	if err != nil {
+		log.Println(err)
+	}
+	t.Execute(w, nil)
+	log.Println("webrtcController-->PeerConnectionAction")
+}
+
 func (this *webrtcController) JsAction(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
@@ -56,6 +65,7 @@ func (this *webrtcController) JsAction(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 		t.Execute(w, nil)
+		log.Println("JsAction: " + parts[2])
 	}
 
 	log.Println("webrtcController-->JsAction")
