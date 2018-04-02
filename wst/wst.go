@@ -26,24 +26,24 @@ func New(path string) *Wst {
 // Run attaches the router to a http.Server and starts listening and serving HTTP requests.
 func (wst *Wst) Run() {
 
-	// http.Handle("/static/html/", http.FileServer(http.Dir("static/html")))
-	// http.Handle("/static/js/", http.FileServer(http.Dir("static/js")))
-	// http.Handle("/static/css/", http.FileServer(http.Dir("static/css")))
-	// http.Handle("/static/", http.FileServer(http.Dir("static")))
-
 	http.HandleFunc("/index/", wst.indexHandler)
 	http.HandleFunc("/admin/", wst.adminHandler)
 	http.HandleFunc("/login/", wst.loginHandler)
 	http.HandleFunc("/ajax/", wst.ajaxHandler)
 	http.HandleFunc("/webrtc/", wst.webrtcHandler)
+	http.HandleFunc("/live/", wst.liveHandler)
+	http.HandleFunc("/playback/", wst.playbackHandler)
 	http.HandleFunc("/", wst.notFoundHandler)
 
-	// log.Fatal(http.ListenAndServe(":8090", nil))
+	http.HandleFunc("/css/", wst.cssHandler)
+	http.HandleFunc("/js/", wst.jsHandler)
+	http.HandleFunc("/icon/", wst.iconHandler)
+
 	log.Fatal(http.ListenAndServeTLS(":8090", wst.confPath+"/key/cert.pem", wst.confPath+"/key/key.pem", nil))
 }
 
 func (wst *Wst) notFoundHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL.Path)
+
 	if r.URL.Path == "/" {
 		http.Redirect(w, r, "/index/", http.StatusFound)
 	}
@@ -154,4 +154,51 @@ func (wst *Wst) webrtcHandler(w http.ResponseWriter, r *http.Request) {
 	responseValue := reflect.ValueOf(w)
 	method.Call([]reflect.Value{responseValue, requestValue})
 	log.Println("webrtc handler")
+}
+
+func (wst *Wst) liveHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (wst *Wst) playbackHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (wst *Wst) jsHandler(w http.ResponseWriter, r *http.Request) {
+	path := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(path, "/")
+	if len(parts) > 1 {
+		t, err := template.ParseFiles(wst.confPath + "/js/" + parts[1])
+		if err != nil {
+			log.Println(err)
+		}
+		t.Execute(w, nil)
+		log.Println("root js action: " + parts[1])
+	}
+}
+
+func (wst *Wst) cssHandler(w http.ResponseWriter, r *http.Request) {
+	path := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(path, "/")
+	if len(parts) > 1 {
+		t, err := template.ParseFiles(wst.confPath + "/css/" + parts[1])
+		if err != nil {
+			log.Println(err)
+		}
+		t.Execute(w, nil)
+		log.Println("root css action: " + parts[1])
+	}
+}
+
+func (wst *Wst) iconHandler(w http.ResponseWriter, r *http.Request) {
+	path := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(path, "/")
+	if len(parts) > 1 {
+		t, err := template.ParseFiles(wst.confPath + "/icon/" + parts[1])
+		if err != nil {
+			log.Println(err)
+		}
+		t.Execute(w, nil)
+		log.Println("root icon action: " + parts[1])
+	}
 }
