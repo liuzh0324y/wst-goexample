@@ -157,11 +157,43 @@ func (wst *Wst) webrtcHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (wst *Wst) liveHandler(w http.ResponseWriter, r *http.Request) {
-
+	pathInfo := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(pathInfo, "/")
+	var action = ""
+	if len(parts) > 1 {
+		action = strings.Title(parts[1]) + "Action"
+	}
+	log.Println("live action: " + action)
+	live := &liveController{path: wst.confPath}
+	controller := reflect.ValueOf(live)
+	method := controller.MethodByName(action)
+	if !method.IsValid() {
+		method = controller.MethodByName(strings.Title("index") + "Action")
+	}
+	requestValue := reflect.ValueOf(r)
+	responseValue := reflect.ValueOf(w)
+	method.Call([]reflect.Value{responseValue, requestValue})
+	log.Println("live handler")
 }
 
 func (wst *Wst) playbackHandler(w http.ResponseWriter, r *http.Request) {
-
+	pathInfo := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(pathInfo, "/")
+	var action = ""
+	if len(parts) > 1 {
+		action = strings.Title(parts[1]) + "Action"
+	}
+	log.Println("playback action: " + action)
+	playback := &playbackController{path: wst.confPath}
+	controller := reflect.ValueOf(playback)
+	method := controller.MethodByName(action)
+	if !method.IsValid() {
+		method = controller.MethodByName(strings.Title("index") + "Action")
+	}
+	requestValue := reflect.ValueOf(r)
+	responseValue := reflect.ValueOf(w)
+	method.Call([]reflect.Value{responseValue, requestValue})
+	log.Println("playback handler")
 }
 
 func (wst *Wst) jsHandler(w http.ResponseWriter, r *http.Request) {
