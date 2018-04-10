@@ -2,7 +2,7 @@
 
 // defaults media constraints
 var MEDIA_CONSTRAINTS = {
-    audio: true,
+    audio: false,
     video: {
         width: 640,
         height: 480,
@@ -27,10 +27,12 @@ function WstWebRtc(mode, options, callback) {
     // }
     console.log("WebRtc instance.")
 
-    var localVideo = options.localVideo
+    var id = options.id;
+    var localVideo = options.localVideo;
     // var remoteVideo = options.remoteVIdeo 
 
-    window.navigator.getUserMedia(MEDIA_CONSTRAINTS, function (stream) { 
+    window.navigator.getUserMedia(MEDIA_CONSTRAINTS, 
+        function (stream) { 
             var videoTracks = stream.getVideoTracks();
             // console.log('Got stream with constraints:', constraints);
             console.log('Using video device: ' + videoTracks[0].label);
@@ -39,7 +41,8 @@ function WstWebRtc(mode, options, callback) {
             };
             window.stream = stream;
             localVideo.srcObject = stream;
-        }, function (err) {
+        }, 
+        function (err) {
             console.log(err)
         })
 }

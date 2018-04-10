@@ -1,9 +1,12 @@
 'use strict';
 
-var errorElement = document.querySelector('#errorMsg')
-var video = document.querySelector('video')
+var errorElement = document.querySelector('errorMsg')
+var localvideo = document.querySelector('video')
+var joinBtn = document.getElementById('join')
 
-var constraints = window.constraints = {
+joinBtn.onclick = join
+
+var constraints = {
     audio: false,
     video: true
 };
@@ -16,7 +19,7 @@ function handleSuccess(stream) {
         console.log('Stream inactive');
     };
     window.stream = stream;
-    video.srcObject = stream;
+    localvideo.srcObject = stream;
 }
 
 function handleError(error) {
@@ -37,4 +40,6 @@ function errorMsg(msg, error) {
     }
 }
 
-navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
+function join() {
+    navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
+}

@@ -26,20 +26,27 @@ func New(path string) *Wst {
 // Run attaches the router to a http.Server and starts listening and serving HTTP requests.
 func (wst *Wst) Run() {
 
-	http.HandleFunc("/index/", wst.indexHandler)
-	http.HandleFunc("/admin/", wst.adminHandler)
-	http.HandleFunc("/login/", wst.loginHandler)
-	http.HandleFunc("/ajax/", wst.ajaxHandler)
-	http.HandleFunc("/webrtc/", wst.webrtcHandler)
-	http.HandleFunc("/live/", wst.liveHandler)
-	http.HandleFunc("/playback/", wst.playbackHandler)
-	http.HandleFunc("/", wst.notFoundHandler)
+	h := http.FileServer(http.Dir(wst.confPath + "/html"))
+	http.Handle("/js/", http.FileServer(http.Dir(wst.confPath+"/js")))
+	http.Handle("/css/", http.FileServer(http.Dir(wst.confPath+"/css")))
+	err := http.ListenAndServeTLS(":8090", wst.confPath+"/key/cert.pem", wst.confPath+"/key/key.pem", h)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+	// http.HandleFunc("/index/", wst.indexHandler)
+	// http.HandleFunc("/admin/", wst.adminHandler)
+	// http.HandleFunc("/login/", wst.loginHandler)
+	// http.HandleFunc("/ajax/", wst.ajaxHandler)
+	// http.HandleFunc("/webrtc/", wst.webrtcHandler)
+	// http.HandleFunc("/live/", wst.liveHandler)
+	// http.HandleFunc("/playback/", wst.playbackHandler)
+	// http.HandleFunc("/", wst.notFoundHandler)
 
-	http.HandleFunc("/css/", wst.cssHandler)
-	http.HandleFunc("/js/", wst.jsHandler)
-	http.HandleFunc("/icon/", wst.iconHandler)
+	// http.HandleFunc("/css/", wst.cssHandler)
+	// http.HandleFunc("/js/", wst.jsHandler)
+	// http.HandleFunc("/icon/", wst.iconHandler)
 
-	log.Fatal(http.ListenAndServeTLS(":8090", wst.confPath+"/key/cert.pem", wst.confPath+"/key/key.pem", nil))
+	// log.Fatal(http.ListenAndServeTLS(":8090", wst.confPath+"/key/cert.pem", wst.confPath+"/key/key.pem", nil))
 }
 
 func (wst *Wst) notFoundHandler(w http.ResponseWriter, r *http.Request) {

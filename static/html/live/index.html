@@ -1,5 +1,6 @@
-<!-- <!doctype html> -->
-<html>
+<!DOCTYPE html>
+
+<html lang="zh-CN">
     <head>
         <meta charset="uft-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,14 +9,14 @@
 
         <title>Home | ******</title>
         
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-        
+        <link type="text/css" href="/css/bootstrap.min.css" rel="stylesheet">
     </head>
     
     <body>
         <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-dark border-botton box-shadow" >
             <h5 class="my-0 mr-md-auto font-weight-normal text-white">牛逼的直播平台</h5>
             <nav class="my-2 my-md-0 mr-md-3">
+                <a class="p-2 text-white" href="/">主页</a>
                 <a class="p-2 text-white" href="/live/">直播</a>
                 <a class="p-2 text-white" href="/playback/">回放</a>
             </nav>
@@ -23,16 +24,18 @@
         </div>
         
         <div class="container">
-            <video id="localvideo" class="bg-dark" width="640" height="480">不支持</video>
-            <button id="joinBtn" class="btn btn-primary" onclick="WstWebRtcRecvOnly(1,2)">加入</button>
+            <video id="localvideo" class="bg-dark" width="640" height="480" autoplay></video>
+            <video id="remotevideo" class="bg-dark" width="640" height="480" autoplay></video>
+            <button id="joinBtn" class="btn btn-primary" type="submit">加入</button>
             <button id="callBtn"class="btn btn-primary" type="submit">呼叫</button>
             <button id="quitBtn" class="btn btn-primary" type="submit">退出</button>
         </div>
-    
-    </body>
+        
+        <script src="/js/jquery-3.3.1.min.js"></script>
+        <script src="/js/popper.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <script src="/js/adapter.js"></script>
+        <script src="/js/wst-live.js"></script>
 
-    <script src="/js/jquery-3.3.1.min.js"></script>
-    <script src="/js/popper.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/wst-webrtc.js"></script>
+    </body>
 </html>
