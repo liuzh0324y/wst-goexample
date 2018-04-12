@@ -42,6 +42,21 @@ function getOtherPc(pc) {
 
 function join() {
     navigator.mediaDevices.getUserMedia(constraints).then(WstGotStreamSuccess).catch(WstGotStreamFailed);
+
+    var ws = new WebSocket('wss://'+ location.host + '/wst');
+    ws.onopen = function(evt) {
+        console.log('Connection open...');
+        ws.send('Hello js websocket.');
+    };
+    
+    ws.onmessage = function(evt) {
+        console.log('Recevied Message: ' + evt.data);
+        ws.close();
+    };
+    
+    ws.onclose = function(evt) {
+        console.log('Connection closed.');
+    }
     console.log('join btn.');
 }
 

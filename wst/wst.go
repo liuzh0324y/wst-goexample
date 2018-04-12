@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"reflect"
 	"strings"
 )
@@ -25,14 +27,16 @@ func New(path string) *Wst {
 
 // Run attaches the router to a http.Server and starts listening and serving HTTP requests.
 func (wst *Wst) Run() {
+	log.Println("wst server start.")
 
-	h := http.FileServer(http.Dir(wst.confPath + "/html"))
-	http.Handle("/js/", http.FileServer(http.Dir(wst.confPath+"/js")))
-	http.Handle("/css/", http.FileServer(http.Dir(wst.confPath+"/css")))
-	err := http.ListenAndServeTLS(":8090", wst.confPath+"/key/cert.pem", wst.confPath+"/key/key.pem", h)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	go wst.WstHttpServer()
+	go wst.WstSignalServer()
+
+	s := <-c
+	log.Println("wst server quit.", s)
 	// http.HandleFunc("/index/", wst.indexHandler)
 	// http.HandleFunc("/admin/", wst.adminHandler)
 	// http.HandleFunc("/login/", wst.loginHandler)
@@ -47,6 +51,23 @@ func (wst *Wst) Run() {
 	// http.HandleFunc("/icon/", wst.iconHandler)
 
 	// log.Fatal(http.ListenAndServeTLS(":8090", wst.confPath+"/key/cert.pem", wst.confPath+"/key/key.pem", nil))
+}
+
+func (wst *Wst) WstHttpServer() {
+	httpserver := NewHttpServer()
+	httpserver.Run()
+	// h := http.FileServer(http.Dir(wst.confPath + "/html"))
+	// http.Handle("/js/", http.FileServer(http.Dir(wst.confPath+"/js")))
+	// http.Handle("/css/", http.FileServer(http.Dir(wst.confPath+"/css")))
+	// err := http.ListenAndServeTLS(":8090", wst.confPath+"/key/cert.pem", wst.confPath+"/key/key.pem", h)
+	// if err != nil {
+	// 	log.Fatal("ListenAndServe: ", err)
+	// }
+}
+
+func (wst *Wst) WstSignalServer() {
+	wsserver := NewSignalServer()
+	wsserver.Run()
 }
 
 func (wst *Wst) notFoundHandler(w http.ResponseWriter, r *http.Request) {
