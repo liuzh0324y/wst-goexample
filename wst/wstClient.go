@@ -21,7 +21,10 @@ type wstClient struct {
 }
 
 func newClient(id string, t *time.Timer) *wstClient {
-	c := wstClient{id: id, timer: t}
+	c := wstClient{
+		id:    id,
+		timer: t}
+
 	return &c
 }
 

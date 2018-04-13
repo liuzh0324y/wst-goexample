@@ -25,7 +25,7 @@
         
         <div class="container">
             <video id="localvideo" class="bg-dark" width="640" height="480" autoplay></video>
-            <video id="remotevideo" class="bg-dark" style="display:none" width="640" height="480" autoplay></video>
+            <video id="remotevideo" class="bg-dark" width="640" height="480" autoplay></video>
             <button id="joinBtn" class="btn btn-primary" type="submit">加入</button>
             <button id="callBtn"class="btn btn-primary" type="submit">呼叫</button>
             <button id="quitBtn" class="btn btn-primary" type="submit">退出</button>
@@ -35,7 +35,20 @@
         <script src="/js/popper.min.js"></script>
         <script src="/js/bootstrap.min.js"></script>
         <script src="/js/adapter.js"></script>
+        <script src="/js/wst-util.js"></script>
         <script src="/js/wst-live.js"></script>
+        <script src="/js/wst-app.js"></script>
+        <script type="text/javascript">
+            var params = {
 
+            };
+            var app;
+
+            function initialize() {
+                app = new WstApp(params);
+            }
+
+            initialize();
+        </script>
     </body>
 </html>

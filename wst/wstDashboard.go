@@ -57,6 +57,13 @@ func (db *wstDashboard) incrWs() {
 	db.totalWs += 1
 }
 
+func (db *wstDashboard) onWsErr(err error) {
+	db.lock.Lock()
+	defer db.lock.Unlock()
+
+	db.wsErrs += 1
+}
+
 func (db *wstDashboard) onHttpErr(err error) {
 	db.lock.Lock()
 	defer db.lock.Unlock()

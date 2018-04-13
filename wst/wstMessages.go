@@ -62,5 +62,6 @@ func send(w io.Writer, data interface{}) error {
 	if err := enc.Encode(data); err != nil {
 		return err
 	}
+
 	return nil
 }

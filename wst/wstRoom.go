@@ -20,7 +20,12 @@ type wstRoom struct {
 }
 
 func newRoom(p *wstRoomTable, id string, to time.Duration, rs string) *wstRoom {
-	return &wstRoom{parent: p, id: id, clients: make(map[string]*wstClient), registerTimeOut: to, roomSrcUrl: rs}
+	return &wstRoom{
+		parent:          p,
+		id:              id,
+		clients:         make(map[string]*wstClient),
+		registerTimeOut: to,
+		roomSrcUrl:      rs}
 }
 
 func (rm *wstRoom) client(clientID string) (*wstClient, error) {

@@ -1,6 +1,7 @@
 package wst
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -62,30 +63,31 @@ loop:
 	for {
 		err := ws.SetReadDeadline(time.Now().Add(time.Duration(wsReadTimeOutSec) * time.Second))
 		if err != nil {
-			log.Fatal("ws.SetReadDeadline error: "+err.Error(), ws)
+			wst.wsError("ws.SetReadDeadline error: "+err.Error(), ws)
 			break
 		}
 
 		err = websocket.JSON.Receive(ws, &msg)
 		if err != nil {
 			if err.Error() != "EOF" {
-				log.Fatal("websocket.JSON.Receive error: "+err.Error(), ws)
+				wst.wsError("websocket.JSON.Receive error: "+err.Error(), ws)
 			}
+
 			break
 		}
 
 		switch msg.Cmd {
 		case "register":
 			if registered {
-				log.Fatal("Duplicated register request", ws)
+				wst.wsError("Duplicated register request", ws)
 				break loop
 			}
 			if msg.RoomID == "" || msg.ClientID == "" {
-				log.Fatal("Invalid register request: missing 'clientid' or 'roomid'", ws)
+				wst.wsError("Invalid register request: missing 'clientid' or 'roomid'", ws)
 				break loop
 			}
 			if err = wst.wstRoomTable.register(msg.RoomID, msg.ClientID, ws); err != nil {
-				log.Fatal(err.Error(), ws)
+				wst.wsError(err.Error(), ws)
 				break loop
 			}
 			registered, rid, cid = true, msg.RoomID, msg.ClientID
@@ -96,21 +98,34 @@ loop:
 
 		case "send":
 			if !registered {
-				log.Fatal("Client not registered", ws)
+				wst.wsError("Client not registered", ws)
 				break loop
 			}
 			if msg.Msg == "" {
-				log.Fatal("Invalid send request: missing 'msg'", ws)
+				wst.wsError("Invalid send request: missing 'msg'", ws)
 				break loop
 			}
 			wst.wstRoomTable.send(rid, cid, msg.Msg)
 			break
 
 		default:
-			log.Fatal("Invalid message: unexpected 'cmd'", ws)
+			wst.wsError("Invalid message: unexpected 'cmd'", ws)
 			break
 		}
 	}
 
+	log.Println("ws close")
 	ws.Close()
+}
+
+func (wst *WstHttpServer) httpError(msg string, w http.ResponseWriter) {
+	err := errors.New(msg)
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+	wst.dash.onHttpErr(err)
+}
+
+func (wst *WstHttpServer) wsError(msg string, ws *websocket.Conn) {
+	err := errors.New(msg)
+	sendServerErr(ws, msg)
+	wst.dash.onWsErr(err)
 }
