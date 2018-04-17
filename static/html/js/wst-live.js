@@ -1,11 +1,11 @@
 
 'use strict';
 
-var localVideo = document.getElementById('localvideo');
-var remoteVideo = document.getElementById('remotevideo');
-var joinBtn = document.getElementById('joinBtn');
-var callBtn = document.getElementById('callBtn');
-var quitBtn = document.getElementById('quitBtn');
+var localVideo = document.getElementById('local-video');
+var remoteVideo = document.getElementById('remote-video');
+var joinBtn = document.getElementById('join-button');
+var callBtn = document.getElementById('call-button');
+var quitBtn = document.getElementById('quit-button');
 
 joinBtn.onclick = join;
 callBtn.onclick = call; 

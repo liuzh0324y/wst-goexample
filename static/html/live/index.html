@@ -24,11 +24,11 @@
         </div>
         
         <div class="container">
-            <video id="localvideo" class="bg-dark" width="640" height="480" autoplay></video>
-            <video id="remotevideo" class="bg-dark" width="640" height="480" autoplay></video>
-            <button id="joinBtn" class="btn btn-primary" type="submit">加入</button>
-            <button id="callBtn"class="btn btn-primary" type="submit">呼叫</button>
-            <button id="quitBtn" class="btn btn-primary" type="submit">退出</button>
+            <video id="local-video" class="bg-dark" width="640" height="480" autoplay></video>
+            <video id="remote-video" class="bg-dark" width="640" height="480" autoplay></video>
+            <button id="join-button" class="btn btn-primary" type="submit">加入</button>
+            <button id="call-button"class="btn btn-primary none" type="submit">呼叫</button>
+            <button id="quit-button" class="btn btn-primary " type="submit">退出</button>
         </div>
         
         <script src="/js/jquery-3.3.1.min.js"></script>
@@ -36,11 +36,20 @@
         <script src="/js/bootstrap.min.js"></script>
         <script src="/js/adapter.js"></script>
         <script src="/js/wst-util.js"></script>
-        <script src="/js/wst-live.js"></script>
+        <script src="/js/wst-signalingchannel.js"></script>
+        <!-- <script src="/js/wst-live.js"></script> -->
+        <script src="/js/wst-call.js"></script>
         <script src="/js/wst-app.js"></script>
+        
         <script type="text/javascript">
             var params = {
-
+                roomServer: ':8090',
+                roomId: 'R1001',
+                clientId: 'C1001',
+                mediaConstraints: {
+                    audio: false,
+                    video: true
+                }
             };
             var app;
 
