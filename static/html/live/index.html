@@ -10,6 +10,7 @@
         <title>Home | ******</title>
         
         <link type="text/css" href="/css/bootstrap.min.css" rel="stylesheet">
+        <link type="text/css" href="/css/wst-common.css" rel="stylesheet">
     </head>
     
     <body>
@@ -23,14 +24,21 @@
             <a class="btn btn-outline-primary" href="/login/">登陆</a>
         </div>
         
-        <div class="container">
+        <div class="hidden">
             <video id="local-video" class="bg-dark" width="640" height="480" autoplay></video>
             <video id="remote-video" class="bg-dark" width="640" height="480" autoplay></video>
-            <button id="join-button" class="btn btn-primary" type="submit">加入</button>
-            <button id="call-button"class="btn btn-primary none" type="submit">呼叫</button>
-            <button id="quit-button" class="btn btn-primary " type="submit">退出</button>
         </div>
-        
+            
+        <form class="form-room">
+            <label for="inputRoom" class="sr-only">Room:</label>
+            <input type="text" id="inputRoom" class="form-control" required autofocus>
+            <label for="inputClient" class="sr-only">Client:</label>
+            <input type="text" id="inputClient" class="form-control" required>
+            <button id="join-button" class="btn btn-primary" type="submit">加入</button>
+            <button id="call-button"class="btn btn-primary display=none" type="submit">呼叫</button>
+            <button id="quit-button" class="btn btn-primary " type="submit">退出</button>
+        </form>
+
         <script src="/js/jquery-3.3.1.min.js"></script>
         <script src="/js/popper.min.js"></script>
         <script src="/js/bootstrap.min.js"></script>
@@ -46,6 +54,7 @@
                 roomServer: ':8090',
                 roomId: 'R1001',
                 clientId: 'C1001',
+                wssUrl: 'wss://10.33.48.14:8090/wst',
                 mediaConstraints: {
                     audio: false,
                     video: true

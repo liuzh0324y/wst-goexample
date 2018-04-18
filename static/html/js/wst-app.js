@@ -13,6 +13,7 @@ var loadingParams = {
     roomServer: ':8090',
     roomId: 'R1001',
     clientId: 'C1001',
+    wssUrl: 'wss://10.33.48.14:8090/wst',
     mediaConstraints: {
         audio: false,
         video: true
@@ -49,14 +50,17 @@ WstApp.prototype.loadUrlParams_ = function() {
 WstApp.prototype.onJoinClick_ = function() {
     trace('click join button.');
     if (this.loadingParams_.roomId) {
-        
+
         this.createCall_();
+
+        this.finishCallSetup_(this.loadingParams_.roomId);
     }
     
 };
 
 WstApp.prototype.onCallClick_ = function() {
     trace('click call button.');
+    this.call_.sendSignalingMessage_('hello');
 };
 
 WstApp.prototype.onQuitClick_ = function() {
@@ -78,6 +82,9 @@ WstApp.prototype.createCall_ = function() {
     this.call_.oncallerstarted = this.displaySharingInfo_.bind(this);
 };
 
+WstApp.prototype.finishCallSetup_ = function(roomId) {
+    this.call_.start(roomId);
+}
 WstApp.prototype.onRemoteHangup_ = function() {
     this.displayStatus_('The remote side hangup up.');
     // Stop waiting for remote video.

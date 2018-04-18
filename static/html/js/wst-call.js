@@ -4,7 +4,7 @@ var WstCall = function(params) {
     this.params_ = params;
     this.roomServer_ = params.roomServer || '';
 
-    this.channel_ = new WstSignalingChannel(params.wssUrl, params.wssPostUrl);
+    this.channel_ = new WstSignalingChannel(params.wssUrl, params.roomId, params.clientId);
     this.channel_.onmessage = this.onRecvSignalingChannelMessage_.bind(this);
 
     this.pcClient_ = null;
@@ -29,14 +29,13 @@ var WstCall = function(params) {
     this.requestMediaAndIceServers_();
 };
 
+WstCall.prototype.isInitiator = function() {
+    return this.params_.isInitiator;
+}
 WstCall.prototype.requestMediaAndIceServers_ = function() {
     this.getMediaPromise_ = this.maybeGetMedia_();
     this.getIceServersPromise_ = this.maybeGetIceServers_();
-    trace('request media and ice servers.')
-};
-
-WstCall.prototype.isInitiator = function() {
-    return this.params_.isInitiator;
+    trace('request media and ice servers.');
 };
 
 WstCall.prototype.start = function(roomId) {
@@ -44,6 +43,35 @@ WstCall.prototype.start = function(roomId) {
     if (this.params_.isLoopback) {
         setupLoopback(this.params_.wssUrl, roomId);
     }
+};
+
+WstCall.prototype.connectToRoom_ = function(roomId) {
+    this.params_.roomId = roomId;
+    // Asynchronously open a WebSocket connection to WSS.
+    // TODO: We don't need to wait for the signaling channel to open before start signaling.
+    var channelPromise = this.channel_.open().catch(function(error) {
+        // this.onError_('WebSocket open error: ' + error.message);
+        return Promise.reject(error);
+    }.bind(this));
+
+    // Asynchronously join the room.
+    var joinPromise = this.joinRoom_().then(function(roomParams) {
+        // This only difference in parameters should be clientId and isInitiator,
+        // and the turn servers that we requested.
+
+        this.params_.roomId = roomparams.room_id;
+        this.params_.clientId = roomParams.client_id;
+        this.params_.isInitiator = roomParams.is_initiator === 'true';
+    })
+};
+
+WstCall.prototype.joinRoom_ = function() {
+    return new Promise(function(resolve, reject) {
+        if (!this.params_.roomId) {
+            reject(Error('Missing room id.'));
+        }
+
+    }.bind(this));
 };
 
 WstCall.prototype.onRemoteHangup = function() {
@@ -124,5 +152,16 @@ WstCall.prototype.onUserMediaError_ = function(error) {
 
 
 WstCall.prototype.onRecvSignalingChannelMessage_ = function(msg) {
+    trace('recv msg: ' + msg);
+};
 
+WstCall.prototype.sendSignalingMessage_ = function(msg) {
+    var msgString = JSON.stringify(msg);
+    this.channel_.send(msgString);
+};
+
+WstCall.prototype.onError_ = function(message) {
+    if (this.onerror) {
+        this.onerror(message);
+    }
 };

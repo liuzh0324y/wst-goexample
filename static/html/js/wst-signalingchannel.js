@@ -1,10 +1,9 @@
 'use strict';
 
-var WstSignalingChannel = function(wssUrl, wssPostUrl) {
+var WstSignalingChannel = function(wssUrl, roomId, clientId) {
     this.wssUrl_ = wssUrl;
-    this.wssPostUrl_ = wssPostUrl;
-    this.roomId_ = null;
-    this.clientId_ = null;
+    this.roomId_ = roomId;
+    this.clientId_ = clientId;
     this.registered_ = false;
 
     // Public callbacks. Keep it sorted.
@@ -19,6 +18,7 @@ WstSignalingChannel.prototype.open = function() {
     }
 
     trace('Opening signaling channel.');
+    trace('wss url: ' + this.wssUrl_);
     return new Promise(function(resolve, reject) {
         this.websocket_ = new WebSocket(this.wssUrl_);
 
@@ -35,7 +35,9 @@ WstSignalingChannel.prototype.open = function() {
             };
     
             if (this.clientId_ && this.roomId_) {
+                trace('Signaling register pre.');
                 this.register(this.roomId_, this.clientId_);
+            } else {
             };
 
             resolve();
@@ -134,12 +136,6 @@ WstSignalingChannel.prototype.send = function(message) {
 
     if (this.websocket_ && this.websocket_.readyState === WebSocket.OPEN) {
         this.websocket_.send(msgString);
-    }
-    else {
-        var path = this.getWssPostUrl();
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', path, true);
-        xhr.send(wssMessage.msg);
     }
 };
 
